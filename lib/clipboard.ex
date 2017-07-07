@@ -50,18 +50,18 @@ defmodule Clipboard do
   end
 
   defp copy({:unix, :darwin}, value) do
-    Application.get_env(:clipboard, :macos)[:copy]
-    |> do_copy(value)
+    command = Application.get_env(:clipboard, :macos)[:copy] || {"pbcopy", []}
+    do_copy(command, value)
   end
 
   defp copy({:unix, _os_name}, value) do
-    Application.get_env(:clipboard, :unix)[:copy]
-    |> do_copy(value)
+    command = Application.get_env(:clipboard, :unix)[:copy] || {"xclip", []}
+    do_copy(command, value)
   end
 
   defp copy({:win32, _os_name}, value) do
-    Application.get_env(:clipboard, :windows)[:copy]
-    |> do_copy(value)
+    command = Application.get_env(:clipboard, :windows)[:copy] || {"clip", []}
+    do_copy(command, value)
   end
 
   defp copy({_unsupported_family, _unsupported_name}, _value) do
@@ -122,13 +122,13 @@ defmodule Clipboard do
   end
 
   defp paste({:unix, :darwin}) do
-    Application.get_env(:clipboard, :macos)[:paste]
-    |> do_paste()
+    command = Application.get_env(:clipboard, :macos)[:paste] || {"pbpaste", []}
+    do_paste(command)
   end
 
   defp paste({:unix, _os_name}) do
-    Application.get_env(:clipboard, :macos)[:paste]
-    |> do_paste()
+    command = Application.get_env(:clipboard, :unix)[:paste] || {"xclip", ["-o"]}
+    do_paste(command)
   end
 
   defp paste(_unsupported_os) do
