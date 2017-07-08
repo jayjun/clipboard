@@ -4,19 +4,13 @@ defmodule ClipboardTest do
   test "copy returns the same value" do
     string = "Hello, World!"
     list = ["Hello", "World"]
+    map = %{hello: "world"}
+    tuple = {"hello", "world"}
 
     assert string == Clipboard.copy(string)
     assert list == Clipboard.copy(list)
-  end
-
-  test "raise when copying values that don't conform to String.Chars" do
-    assert_raise Protocol.UndefinedError, fn ->
-      Clipboard.copy({"Hello", "World"})
-    end
-
-    assert_raise Protocol.UndefinedError, fn ->
-      Clipboard.copy(%{"hello" => "world"})
-    end
+    assert map == Clipboard.copy(map)
+    assert tuple == Clipboard.copy(tuple)
   end
 
   test "copy followed by paste should be the same value" do

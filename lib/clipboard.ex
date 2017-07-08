@@ -9,9 +9,7 @@ defmodule Clipboard do
   @doc """
   Copy `value` to system clipboard.
 
-  `value` can be any type that conforms to `String.Chars` (e.g. binaries, iodata), so
-  `Kernel.to_string/1` is used to serialize input before copying to clipboard. The original `value`
-  is always returned, so `copy/1` can be used in pipelines.
+  The original `value` is always returned, so `copy/1` can be used in pipelines.
 
   # Examples
 
@@ -27,7 +25,7 @@ defmodule Clipboard do
   """
   @spec copy(iodata) :: iodata
   def copy(value) do
-    copy(:os.type(), to_string(value))
+    copy(:os.type(), value)
     value
   end
 
@@ -41,7 +39,7 @@ defmodule Clipboard do
   """
   @spec copy!(iodata) :: iodata | no_return
   def copy!(value) do
-    case copy(:os.type(), to_string(value)) do
+    case copy(:os.type(), value) do
       :ok ->
         value
       {:error, reason} ->
@@ -51,36 +49,20 @@ defmodule Clipboard do
 
   defp copy({:unix, :darwin}, value) do
     command = Application.get_env(:clipboard, :macos)[:copy] || {"pbcopy", []}
-    do_copy(command, value)
+    execute(command, value)
   end
 
   defp copy({:unix, _os_name}, value) do
     command = Application.get_env(:clipboard, :unix)[:copy] || {"xclip", []}
-    do_copy(command, value)
+    execute(command, value)
   end
 
   defp copy({:win32, _os_name}, value) do
     command = Application.get_env(:clipboard, :windows)[:copy] || {"clip", []}
-    do_copy(command, value)
+    execute(command, value)
   end
 
   defp copy({_unsupported_family, _unsupported_name}, _value) do
-    {:error, "Unsupported operating system"}
-  end
-
-  defp do_copy({executable, args}, value) when is_binary(executable) and is_list(args) do
-    case System.find_executable(executable) do
-      nil ->
-        {:error, "Cannot find #{executable}"}
-      path ->
-        port = Port.open({:spawn_executable, path}, [:binary, args: args])
-        send port, {self(), {:command, value}}
-        send port, {self(), :close}
-        :ok
-    end
-  end
-
-  defp do_copy(nil, _value) do
     {:error, "Unsupported operating system"}
   end
 
@@ -123,19 +105,23 @@ defmodule Clipboard do
 
   defp paste({:unix, :darwin}) do
     command = Application.get_env(:clipboard, :macos)[:paste] || {"pbpaste", []}
-    do_paste(command)
+    execute(command)
   end
 
   defp paste({:unix, _os_name}) do
     command = Application.get_env(:clipboard, :unix)[:paste] || {"xclip", ["-o"]}
-    do_paste(command)
+    execute(command)
   end
 
   defp paste(_unsupported_os) do
     {:error, "Unsupported operating system"}
   end
 
-  defp do_paste({executable, args}) when is_binary(executable) and is_list(args) do
+  # Ports
+
+  defp execute(nil), do: {:error, "Unsupported operating system"}
+
+  defp execute({executable, args}) when is_binary(executable) and is_list(args) do
     case System.find_executable(executable) do
       nil ->
         {:error, "Cannot find #{executable}"}
@@ -147,5 +133,32 @@ defmodule Clipboard do
             {:error, error}
         end
     end
+  end
+
+  defp execute(nil, _), do: {:error, "Unsupported operating system"}
+
+  defp execute({executable, args}, value) when is_binary(executable) and is_list(args) do
+    case System.find_executable(executable) do
+      nil ->
+        {:error, "Cannot find #{executable}"}
+      path ->
+        port = Port.open({:spawn_executable, path}, [:binary, args: args])
+
+        case value do
+          value when is_binary(value) ->
+            send(port, {self(), {:command, value}})
+          value ->
+            send(port, {self(), {:command, format(value)}})
+        end
+
+        send(port, {self(), :close})
+        :ok
+    end
+  end
+
+  defp format(value) do
+    opts = struct(Inspect.Opts, [])
+    doc = Inspect.Algebra.to_doc(value, opts)
+    Inspect.Algebra.format(doc, opts.width)
   end
 end
