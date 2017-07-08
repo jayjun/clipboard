@@ -6,7 +6,7 @@ defmodule Clipboard.Mixfile do
   def project() do
     [
       app: :clipboard,
-      version: "0.1.1",
+      version: "0.2.0",
       elixir: "~> 1.4",
       name: "Clipboard",
       description: "Copy and paste from system clipboard",
