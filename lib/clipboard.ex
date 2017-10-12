@@ -157,8 +157,7 @@ defmodule Clipboard do
   end
 
   defp format(value) do
-    opts = struct(Inspect.Opts, [])
-    doc = Inspect.Algebra.to_doc(value, opts)
+    doc = Inspect.Algebra.to_doc(value, %Inspect.Opts{limit: :infinity})
     Inspect.Algebra.format(doc, opts.width)
   end
 end
