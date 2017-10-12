@@ -12,16 +12,14 @@ clipboard utilities on macOS, Linux and Windows but can be configured to call an
 ## Examples
 
 ```elixir
-Clipboard.copy("Hello, World!")
-"Hello, World!"
+Clipboard.copy("Hello, World!") # Copied to clipboard
 
-"Bye, World!"
+"Hello, World!"
 |> Clipboard.copy() # Insert into pipelines
-|> send_to_api()
+|> business_as_usual()
 
 # And paste too!
-Clipboard.paste()
-"Bye, World!"
+greeting = Clipboard.paste()
 ```
 
 ## Options
