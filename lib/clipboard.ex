@@ -158,6 +158,6 @@ defmodule Clipboard do
 
   defp format(value) do
     doc = Inspect.Algebra.to_doc(value, %Inspect.Opts{limit: :infinity})
-    Inspect.Algebra.format(doc, opts.width)
+    Inspect.Algebra.format(doc, :infinity)
   end
 end
