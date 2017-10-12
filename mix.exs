@@ -23,7 +23,7 @@ defmodule Clipboard.Mixfile do
   defp deps() do
     [
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.16"},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
     ]
   end
 
