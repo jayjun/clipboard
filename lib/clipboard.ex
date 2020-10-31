@@ -42,6 +42,7 @@ defmodule Clipboard do
     case copy(:os.type(), value) do
       :ok ->
         value
+
       {:error, reason} ->
         raise reason
     end
@@ -75,11 +76,12 @@ defmodule Clipboard do
       "Hello, World!"
 
   """
-  @spec paste() :: String.t
+  @spec paste() :: String.t()
   def paste() do
     case paste(:os.type()) do
       {:error, _reason} ->
         nil
+
       output ->
         output
     end
@@ -93,11 +95,12 @@ defmodule Clipboard do
   The operation may fail when running Clipboard on unsupported operating systems or with missing
   executables (check your config).
   """
-  @spec paste!() :: String.t | no_return
+  @spec paste!() :: String.t() | no_return
   def paste!() do
     case paste(:os.type()) do
       {:error, reason} ->
         raise reason
+
       output ->
         output
     end
@@ -125,10 +128,12 @@ defmodule Clipboard do
     case System.find_executable(executable) do
       nil ->
         {:error, "Cannot find #{executable}"}
+
       _ ->
         case System.cmd(executable, args) do
           {output, 0} ->
             output
+
           {error, _} ->
             {:error, error}
         end
@@ -141,12 +146,14 @@ defmodule Clipboard do
     case System.find_executable(executable) do
       nil ->
         {:error, "Cannot find #{executable}"}
+
       path ->
         port = Port.open({:spawn_executable, path}, [:binary, args: args])
 
         case value do
           value when is_binary(value) ->
             send(port, {self(), {:command, value}})
+
           value ->
             send(port, {self(), {:command, format(value)}})
         end

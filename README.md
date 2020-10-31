@@ -27,7 +27,7 @@ greeting = Clipboard.paste()
 Clipboard uses these utilities by default.
 
 | OS      | Utilities            |
-|---------|----------------------|
+| ------- | -------------------- |
 | macOS   | `pbcopy` & `pbpaste` |
 | Linux   | `xclip`              |
 | Windows | `clip`               |
@@ -38,12 +38,11 @@ However, you can instruct Clipboard to use another command by setting `config.ex
 config :clipboard,
   unix: [
     copy: {"xsel", ["-i"]},
-    paste: {"xsel", ["-o"]},
+    paste: {"xsel", ["-o"]}
   ]
 ```
 
 Supported operating systems are `:macos`, `:unix` and `:windows`.
-
 
 ## Installation
 
@@ -51,7 +50,9 @@ Add `clipboard` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:clipboard, ">= 0.0.0", only: [:dev]}]
+  [
+    {:clipboard, ">= 0.0.0", only: [:dev]}
+  ]
 end
 ```
 
@@ -67,15 +68,13 @@ Pasting on Windows doesn’t work out of the box because `clip` only supports co
 
 ## Links
 
-* [Documentation][1]
-* [Hex][2]
+- [Documentation][1]
+- [Hex][2]
 
 ## License
 
 Clipboard is released under [MIT][3] license.
 
 [1]: https://hexdocs.pm/clipboard/Clipboard.html
-
 [2]: https://hex.pm/packages/clipboard
-
 [3]: https://github.com/jayjun/clipboard/blob/master/LICENSE.md
