@@ -1,6 +1,6 @@
 # Clipboard
 
-[![Hex.pm](https://img.shields.io/hexpm/v/clipboard.svg)](https://hex.pm/packages/clipboard)
+![](https://github.com/jayjun/clipboard/workflows/CI/badge.svg)
 
 Copy and paste from system clipboard.
 
