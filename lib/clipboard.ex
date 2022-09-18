@@ -115,6 +115,11 @@ defmodule Clipboard do
     command = Application.get_env(:clipboard, :unix)[:paste] || {"xclip", ["-o"]}
     execute(command)
   end
+  
+  defp paste({:win32, _os_name}) do
+    command = Application.get_env(:clipboard, :windows)[:paste] || {"powershell", ["Get-Clipboard"]}
+    execute(command)
+  end
 
   defp paste(_unsupported_os) do
     {:error, "Unsupported operating system"}
